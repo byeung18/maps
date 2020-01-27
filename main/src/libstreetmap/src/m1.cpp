@@ -1,11 +1,13 @@
-#define SIDEROADLENGTH 2000 // length is in metres
+#define SIDEROADLENGTH 2000 // length in metres
 #define MAINROADLENGTH 5000
 
 #include <cmath>
 #include <string>
+#include <thread>
 #include "DataStructure.h"
 #include "StreetsDatabaseAPI.h"
 #include "OSMDatabaseAPI.h"
+#include "Streets.h"
 #include "m1.h"
 //#include "m2.h"
 //#include "m3.h"
@@ -26,7 +28,6 @@ void load_poi();
 void load_features();
 void load_osmid();
 
-// load the map
 bool load_map(string map_path) {
     // if successful load
     if (loadStreetsDatabaseBIN(map_path)) {
@@ -49,12 +50,8 @@ bool load_map(string map_path) {
         
 }
 
-//close the map
-
 void close_map() {
     closeStreetDatabase();
     cout << "INFO: Window closed" << endl;
-    // destroy any data structures you created in load_map
-    // ...
 }
 
