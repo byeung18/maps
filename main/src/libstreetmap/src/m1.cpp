@@ -17,7 +17,8 @@ using namespace std;
 
 
 // load the map
-bool load_map(string map_name) /*done*/ {
+bool load_map(string map_name) {
+    //test commit
 
 return 0;
 }
