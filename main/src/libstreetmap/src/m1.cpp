@@ -2,6 +2,10 @@
 #define MAINROADLENGTH 5000
 
 #include <cmath>
+#include <string>
+#include "DataStructure.h"
+#include "StreetsDatabaseAPI.h"
+#include "OSMDatabaseAPI.h"
 #include "m1.h"
 //#include "m2.h"
 //#include "m3.h"
@@ -17,10 +21,18 @@ using namespace std;
 
 
 // load the map
-bool load_map(string map_name) {
-    //test commit
-
-return 0;
+bool load_map(string map_path) {
+    // if successful load
+    if (loadStreetsDatabaseBIN(map_path)) {
+        auto iter = 
+        
+        
+        
+        return true;
+    } else {
+        return false;
+    }
+        
 }
 
 //close the map
@@ -34,7 +46,7 @@ void close_map() {
 
 // Finds the average speed limit for a given street
 double averageSpeed(unsigned streetID) {
-
+    
 return 0;
 }
 
