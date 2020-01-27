@@ -13,20 +13,34 @@
 
 using namespace std;
 
-// We want to use the unordered map to reduce computation time
+// global numbers
+unsigned numberOfStreets;
+unsigned numberOfIntersections;
+unsigned numberOfStreetSegments;
+unsigned numberOfPointsOfInterest;
 
-
-
-// These global variables will be needed in multiple functions.
-
+// functions to be implemented:
+void load_streets();
+void load_intersections();
+void load_poi();
+void load_features();
+void load_osmid();
 
 // load the map
 bool load_map(string map_path) {
     // if successful load
     if (loadStreetsDatabaseBIN(map_path)) {
-        auto iter = 
+        auto iter = map_path.find("streets.bin");
+        map_path.erase(iter);
+        thread loadOSM(loadOSMDatabaseBIN, map_path);
+        thread loadSearch(load_search_database);
         
-        
+        // load information
+        load_streets();
+        load_intersections();
+        load_poi();
+        load_features();
+        load_osmid();
         
         return true;
     } else {
