@@ -8,7 +8,6 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include "DataStructure.h"
 #include "OSMDatabaseAPI.h"
 #include "StreetsDatabaseAPI.h"
 #include "Streets.h"
@@ -183,5 +182,27 @@ void load_streets() {
             streetSegmentLength[i] = totalDistance;
             streetSegmentTime[i] = (totalDistance / speed_limit);
         }
+    }
+}
+
+void load_intersections() {
+    unsigned i, j;
+    
+    set<unsigned> intersections;
+    for (i = 0; i < numberOfStreets; i++) {
+        // get street segment
+        vector<StreetSegmentInfo> temp = streets[i]->streetSegments;
+        for (j = 0; j < temp.size(); j++) {
+            // insert segment into set
+            intersections.insert(temp[j].to);
+            intersections.insert(temp[j].from);
+        }
+        // copy set to vector
+        vector<unsigned>intersectionIDs(intersections.begin(), intersections.end());
+        // insert intersection into streets
+        streets[i]->insertIntersectionID(intersectionIDs);
+        // clear vector and set for the next street
+        intersections.clear();
+        intersectionIDs.clear();
     }
 }
