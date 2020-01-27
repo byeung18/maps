@@ -1,4 +1,4 @@
- #pragma once //protects against multiple inclusions of this header file
+#pragma once //protects against multiple inclusions of this header file
 
 #include <string>
 #include "LatLon.h"
