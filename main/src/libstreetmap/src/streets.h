@@ -20,19 +20,19 @@ public:
     vector<StreetSegmentInfo> streetSegments;
     vector<unsigned> streetSegmentIDs;
 
-    topLevelStreets(string _name, unsigned _id);
+    streets(string _name, unsigned _id);
 
     void insertIntersectionID(vector<unsigned> _intersectionID);
 
     void insertStreetSegmentInfo(StreetSegmentInfo info);
 
-    void insertStreetSegmentIDs(unsigned streetSegmentsIDs);
+    void insertStreetSegmentIDs(unsigned streetSegmentIDs);
 
     string getStreetName();
 
     unsigned getStreetId();
 
-    ~Streets();
+    ~streets();
 };
 
 #endif
