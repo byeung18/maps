@@ -22,7 +22,7 @@ Streets** streets;
 double* streetSegmentTime;
 double* streetSegmentLength;
 vector<unsigned>* streetSegments;
-vector<string>* streetSegmentName;
+vector<string>* streetSegmentNames;
 vector<StreetSegmentInfo> streetSegments_new;
 
 std::unordered_map<string, std::vector<unsigned>> name_streetID;
@@ -56,7 +56,7 @@ bool load_map(string map_path) {
         streetSegments_new.resize(numberOfStreetSegments);
         
         // Ensure all pointers are null
-        clean_data_structures();
+        cleanup_data_structures();
         
         // load information
         load_streets();
@@ -77,7 +77,7 @@ bool load_map(string map_path) {
 }
 
 // set all pointers to null
-void clean_data_structures() {
+void cleanup_data_structures() {
     unsigned i;
     
     if (streets != nullptr) {
@@ -106,19 +106,15 @@ void clean_data_structures() {
         streetSegments = nullptr;
     }
 
-    if (streetSegmentsName != nullptr) {
-        delete [] streetSegmentName;
-        pointer_streetSegmentsName = nullptr;
+    if (streetSegmentNames != nullptr) {
+        delete [] streetSegmentNames;
+        pointer_streetSegmentNames = nullptr;
     }
 }
 
 void close_map() {
     //Clean-up your map related data structures here
-    clean_data_structures();
-
-    if (searchDatabase.root != nullptr) {
-        delete searchDatabase.root;
-    }
+    cleanup_data_structures();
     closeStreetDatabase();
     cout << "INFO: Window closed" << endl;
 }
@@ -206,3 +202,134 @@ void load_intersections() {
         intersectionIDs.clear();
     }
 }
+
+void load_poi() /*NOT DONE*/{
+    numberOfPointsOfInterest = getNumberOfPointsOfInterest();
+    for (unsigned p = 0; p < numberOfPointsOfInterest; p++) {
+        //implement
+    }
+}
+
+double find_distance_between_two_points(LatLon point1, LatLon point2) {
+    double latavg = (point1.lat() + point2.lat()) / 2 * DEG_TO_RAD;
+    double x1 = point1.lon() * cos(latavg);
+    double y1 = point1.lat();
+    double x2 = point2.lon() * cos(latavg);
+    double y2 = point2.lat();
+    return EARTH_RADIUS_IN_METERS * sqrt(pow(y2 - y1, 2.0) + pow(x2 - x1, 2.0));
+}
+
+// are the two intersections (id1 and id2) directly connected
+bool are_directly_connected(unsigned id1, unsigned id2) {
+    // check if valid intersections
+    if (id1 > numberOfIntersections || id2 > numberOfIntersections) {
+        //cout <<"invalid input"<< endl;
+        return false;
+    }
+    
+    unsigned numSegments = getIntersectionSegmentCount(id1);
+
+    if (id1 == id2) {
+        return true;
+    } else {
+        for (unsigned i = 0; i < numSegments; i++) {
+            StreetSegmentIndex j = getIntersectionStreetSegment(id1, i);
+            StreetSegmentInfo StreetInfo = getStreetSegmentInfo(j);
+            if (StreetInfo.from == id1) {
+                if (StreetInfo.to == id2) {
+                    return true;
+                }
+            } else if (!StreetInfo.oneWay) {
+                if (StreetInfo.from == id2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+std::vector<unsigned> find_street_ids_from_name(std::string street_name) {
+    // return vector in unordered map
+    vector <unsigned> street_ids;
+    vector <unsigned> temp = name_streetID[street_name];
+    set <unsigned> tempSet(temp.begin(), temp.end());
+    street_ids.assign(tempSet.begin(), tempSet.end());
+    return street_ids;
+}
+
+std::vector<unsigned> find_intersection_street_segments(unsigned intersection_id) {
+    return streetSegments[intersection_id];
+}
+
+std::vector<std::string> find_intersection_street_names(unsigned intersection_id) {
+    return streetSegmentNames[intersection_id];
+}
+
+std::vector<unsigned> find_adjacent_intersections(unsigned intersection_id) {
+    unsigned numSegments = getIntersectionStreetSegmentCount(intersection_id);
+    set<unsigned> adjacent;
+    for (unsigned i = 0; i < numSegments; i++) {
+        StreetSegmentIndex j = getIntersectionStreetSegment(intersection_id, i);
+        StreetSegmentInfo StreetInfo = getStreetSegmentInfo(j);
+
+        if (StreetInfo.from == intersection_id)
+            adjacent.insert(StreetInfo.to);
+        else if (!StreetInfo.oneWay)
+            adjacent.insert(StreetInfo.from);
+    }
+    return vector<unsigned>(adjacent.begin(), adjacent.end());
+}
+
+std::vector<unsigned> find_street_street_segments(unsigned street_id) {
+    return streets[street_id]->streetSegmentsIndex;
+}
+
+std::vector<unsigned> find_all_street_intersections(unsigned street_id) {
+    return streets[street_id]->intersectionID;
+}
+
+std::vector<unsigned> find_intersection_ids_from_street_names(std::string street1, std::string street2) {
+    vector<unsigned> id1 = find_street_ids_from_name(street1);
+    vector<unsigned> id2 = find_street_ids_from_name(street2);
+    vector<unsigned> intersection1;
+    vector<unsigned> intersection2;
+    vector<unsigned> intersection_ids;
+    
+    if (id1.empty()) {
+        return id1;
+    } else if (id2.empty()) {
+        return id2;
+    }
+    
+    for (vector<unsigned>::iterator it1 = id1.begin(); it1 != id1.end(); it1++) {
+        intersectionIDs.insert(intersection1.end(), streets[*it1]->intersectionID.begin(), streets[*it1]->intersectionID.end());
+    }
+    
+    for (vector<unsigned>::iterator it2 = id2.begin(); it2 != id2.end(); it2++) {
+        intersection_ids.insert(intersection2.end(), streets[*it2]->intersectionID.begin(), streets[*it2]->intersectionID.end());
+    }
+    
+    set_intersection(intersection1.begin(), intersection1.end(),
+            intersection2.begin(), intersection2.end(), back_inserter(intersection_ids));
+
+    return intersection_ids;
+}
+
+double find_street_segment_length(unsigned segment_id) {
+    return streetSegmentLength[segment_id];
+}
+
+double find_street_length(unsigned street_id) {
+    double length = 0.0
+    vector<unsigned> segments = streets[street_id]->streetSegmentsIndex;
+    for (unsigned i = 0; i < segments.size(); i++) {
+        length += find_street_segment_length(segments[i]);
+    }
+    return length;
+}
+
+double find_street_segment_travel_time(unsigned segment_id) {
+    return streetSegmentTime[segment_id];
+}
+
